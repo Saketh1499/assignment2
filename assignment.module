@@ -82,14 +82,7 @@ $form['file'] = array(
         '#description' => t('<span style="color:red;">Upload a file, allowed extensions: doc docx txt pdf pptx png jpg jpeg').'</span>',
         '#attributes' => array('multiple' => 'multiple'),
         //'file_validate_extensions' => array('doc docx txt pdf pptx png jpg jpeg'),
-        //'#required' => TRUE,
-        '#states' => array(
-          'visible' => array(
-            ':input[name="upl"]' => array(
-               'checked' => True
-        )
-      )
-    )
+        //'#required' => TRUE;
   );
   $form['submit'] = array(
     '#type' => 'submit',
@@ -194,9 +187,7 @@ function assignment_submission_form_validate($form, &$form_state) {
 }
 
   //validate Upload files
-  $form_state['values']['file'] == 1;
-  
-    if (isset($_FILES['file']))
+  if (isset($_FILES['file']))
     {
       /* check if atleast one source or result file is uploaded */
       if (!($_FILES['file']['name']['file']))
@@ -261,8 +252,8 @@ function assignment_submission_form_submit($form, &$form_state) {
 
       if ($form_state['values']['file'] == 1)
     {
-    $root_path = uploads();
-    $dest_path1 = '$uploads' . '$roll_no';
+    $root_path = Uploads();
+    $dest_path1 = '$Uploads' . '$roll_no';
     $dest_path2 = '$roll_no/';
     $dest_path = $dest_path1 . '$roll_no/';
     $db_path = 'upld/';
@@ -286,10 +277,10 @@ function assignment_submission_form_submit($form, &$form_state) {
         /* uploading file */
         if (move_uploaded_file($_FILES['file']['tmp_name'][$file_form_name], $root_path . $dest_path . $_FILES['files']['name'][$file_form_name]))
         {
-          $query = "INSERT {upld} SET uimg = :uimg WHERE upld_id = :upld_id AND roll_no = :roll_no";
+          $query = "INSERT INTO upld (upld_id, uimg, roll_no) VALUES (:upld_id, :uimg. :roll_no)";
           $args = array(
-            ":uimg" => $dest_path2 . $_FILES['file']['name'][$file_form_name],
             ":upld_id" => $upld_id,
+            ":uimg" => $uimg,,
             ":roll_no" => $roll_no
           );
           $updateresult = db_query($query, $args);
