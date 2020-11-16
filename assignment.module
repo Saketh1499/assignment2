@@ -280,14 +280,14 @@ function assignment_submission_form_submit($form, &$form_state) {
                                 //move_uploaded_file($temp_name,$path_filename_ext);
                                // echo "$val File Uploaded Successfully.";
                                 
-                        $v = $val;
-                        $roll_no = $v['roll_no'];
+                        $uimg = $val;
+                        
                         $q = "INSERT INTO {upld}
                         (roll_no,
                         uimg
                         )VALUES 
                         (:roll_no,
-                         :$v
+                         :$uimg
                         )";
                           $args = array(
                               ":roll_no" => $v['roll_no'],
