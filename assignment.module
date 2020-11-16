@@ -249,54 +249,55 @@ function assignment_submission_form_submit($form, &$form_state) {
       $query = db_query($result, $args, array('return' => Database::RETURN_INSERT_ID));
      
 
+        $fileNames = array_filter($_FILES['files']['name']); 
+        $allowTypes = array('pdf','docx','pptx','xlsx','JPEG','PNG','JPG','jpeg','png','jpg');
+        if(!empty($fileNames))
+        { 
+          foreach($_FILES['files']['name'] as $key=>$val)
+            { 
+                // File upload path    
+                $fileName = basename($_FILES['files']['name'][$key]); 
+                $target_dir = "Uploads/".$roll_no."/";
 
-      if ($form_state['values']['file'] == 1)
-    {
-    $root_path = Uploads();
-    $dest_path1 = '$Uploads' . '$roll_no';
-    $dest_path2 = '$roll_no/';
-    $dest_path = $dest_path1 . '$roll_no/';
-    $db_path = 'upld/';
-    //var_dump($root_path . $dest_path1);die;
-    if (!is_dir($root_path . $dest_path1))
-      mkdir($root_path . $dest_path1);
-    if (!is_dir($root_path . $dest_path))
-      mkdir($root_path . $dest_path);
-    /* uploading files */
-    foreach ($_FILES['file']['name'] as $file_form_name => $file_name)
-    {
-      if ($file_name)
-      {
-        /* checking file type */
-        $file_type = 'S';
-        if (file_exists($root_path . $dest_path . $_FILES['file']['name'][$file_form_name]))
-        {
-          // drupal_set_message(t("Error uploading file. File !filename already exists.", array('!filename' => $_FILES['files']['name'][$file_form_name])), 'error');
-          unlink($root_path . $dest_path . $_FILES['file']['name'][$file_form_name]);
-        } //file_exists($root_path . $dest_path . $_FILES['files']['name'][$file_form_name])
-        /* uploading file */
-        if (move_uploaded_file($_FILES['file']['tmp_name'][$file_form_name], $root_path . $dest_path . $_FILES['files']['name'][$file_form_name]))
-        {
-          $query = "INSERT INTO upld (upld_id, uimg, roll_no) VALUES (:upld_id, :uimg. :roll_no)";
-          $args = array(
-            ":upld_id" => $upld_id,
-            ":uimg" => $uimg,,
-            ":roll_no" => $roll_no
-          );
-          $updateresult = db_query($query, $args);
-          drupal_set_message($file_name . ' uploaded successfully.', 'status');
-        } //move_uploaded_file($_FILES['files']['tmp_name'][$file_form_name], $root_path . $dest_path . $_FILES['files']['name'][$file_form_name])
-        else
-        {
-          drupal_set_message('Error uploading file : ' . $db_path . '/' . $file_name, 'error');
-        }
-      } //$file_name
-    } //$_FILES['files']['name'] as $file_form_name => $file_name
-  } //$form_state['values']['files'] == 1
-  else
-  {
-    $file_name = "Not Uploaded";
-  }
+                if(!is_dir($target_dir)) 
+                {
+                    mkdir($target_dir);
+                }
+                 $file = $val;
+                 $path = pathinfo($file);
+                 $filename = $path['filename'];
+                 $ext = $path['extension'];
+                 if(in_array($ext, $allowTypes)) 
+                 {
+                    $temp_name = $_FILES['files']['tmp_name'][$key];
+                    $path_filename_ext = $target_dir.$filename.".".$ext;
+                    if(!file_exists($path_filename_ext))
+                    {
+                    move_uploaded_file($temp_name, $path_filename_ext);
+                    }
+                    
+                                //else{
+                                //move_uploaded_file($temp_name,$path_filename_ext);
+                               // echo "$val File Uploaded Successfully.";
+                                
+                        $v = $val;
+                        $q = "INSERT INTO {upld}
+                        (roll_no,
+                        uimg
+                        )VALUES 
+                        (:roll_no,
+                         :$v
+                        )";
+                        $sql = db_query($q, $args, array('return' => Database::RETURN_INSERT_ID));
+
+            }
+
+            }}
+            else{ 
+                    $statusMsg = 'Please select a file to upload.'; 
+                    } 
+
+
 
   drupal_set_message(t('The form has been submitted and the Files has been saved.'));
 }
