@@ -75,12 +75,11 @@ $form['date'] = array(
     //'#maxlength' => 2000,
 
   );
-$form['file'] = array(
+$form['files'] = array(
         '#type' => 'file',
         '#title' => t('File Upload'),
         '#attributes' => array('multiple' => 'multiple'),
         '#description' => t('<span style="color:red;">Upload a file, allowed extensions: doc docx txt pdf pptx png jpg jpeg').'</span>',
-        '#attributes' => array('multiple' => 'multiple'),
         //'file_validate_extensions' => array('doc docx txt pdf pptx png jpg jpeg'),
         //'#required' => TRUE;
   );
@@ -280,18 +279,17 @@ function assignment_submission_form_submit($form, &$form_state) {
                                 //move_uploaded_file($temp_name,$path_filename_ext);
                                // echo "$val File Uploaded Successfully.";
                                 
-                        $uimg = $val;
-                        
+                        $uimg = $v['files'];
                         $q = "INSERT INTO {upld}
                         (roll_no,
                         uimg
                         )VALUES 
                         (:roll_no,
-                         :$uimg
+                         :uimg
                         )";
                           $args = array(
                               ":roll_no" => $v['roll_no'],
-                              ":uimg" => $v['uimg']
+                              ":uimg" => $v['files']
                           );
                         $query = db_query($q, $args, array('return' => Database::RETURN_INSERT_ID));
 
