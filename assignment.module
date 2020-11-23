@@ -81,7 +81,7 @@ $form['files'] = array(
         '#attributes' => array('multiple' => 'multiple'),
         '#description' => t('<span style="color:red;">Upload a file, allowed extensions: doc docx txt pdf pptx png jpg jpeg').'</span>',
         //'file_validate_extensions' => array('doc docx txt pdf pptx png jpg jpeg'),
-        //'#required' => TRUE;
+        //'#required' => TRUE,
   );
   $form['submit'] = array(
     '#type' => 'submit',
@@ -185,31 +185,33 @@ function assignment_submission_form_validate($form, &$form_state) {
 
 }
 
-  //validate Upload files
-  if (isset($_FILES['file']))
+
+//Validation of Upload code
+/*$form_state['values']['files'] = $form_state['values']['files'];
+if ($form_state['values']['files'] == 1)
+{*/
+ if (isset($_FILES['files']))
     {
       /* check if atleast one source or result file is uploaded */
-      if (!($_FILES['file']['name']['file']))
-        form_set_error('file', t('Please upload a file.'));
+      if (!($_FILES['files']['name']))
+        form_set_error('files', t('Please upload a file.'));
       /* check for valid filename extensions */
-      foreach ($_FILES['file']['name'] as $file_form_name => $file_name)
+      foreach ($_FILES['files']['name'] as $file_form_name => $file_name)
       {
         if ($file_name)
         {
-          $allowed_extensions = 'doc docx txt pdf pptx png jpg jpeg';
-          $fnames = explode('.', strtolower($_FILES['file']['name'][$file_form_name]));
+          $allowed_extensions_str = 'pdf,docx,txt, doc,pptx,jpeg,png,jpg';
+          $allowed_extensions = explode(',', $allowed_extensions_str);
+          $fnames = explode('.', strtolower($_FILES['files']['name'][$file_form_name]));
           $temp_extension = end($fnames);
           if (!in_array($temp_extension, $allowed_extensions))
             form_set_error($file_form_name, t('Only file with ' . $allowed_extensions_str . ' extensions can be uploaded.'));
-          if ($_FILES['file']['size'][$file_form_name] <= 0)
+          if ($_FILES['files']['size'][$file_form_name] <= 0)
             form_set_error($file_form_name, t('File size cannot be zero.'));
           /* check if valid file name */
-          if (!textbook_companion_check_valid_filename($_FILES['file']['name'][$file_form_name]))
-            form_set_error($file_form_name, t('Invalid file name specified. Only alphabets and numbers are allowed as a valid filename.'));
         } //$file_name
       } //$_FILES['files']['name'] as $file_form_name => $file_name
     } //isset($_FILES['files'])
-   //$form_state['values']['files'] == 1
   return;
 
 
@@ -247,28 +249,27 @@ function assignment_submission_form_submit($form, &$form_state) {
 
       $query = db_query($result, $args, array('return' => Database::RETURN_INSERT_ID));
      
-
-        $fileNames = array_filter($_FILES['files']['name']); 
+    $fileNames = array_filter($_FILES['files']['name']); 
         $allowTypes = array('pdf','docx','txt','doc','pptx','jpeg','png','jpg');
         if(!empty($fileNames))
         { 
-          foreach($_FILES['files']['name'] as $key=>$val)
+          foreach($_FILES['files']['name'] as $file_form_name=>$file_name)
             { 
                 // File upload path    
-                $fileName = basename($_FILES['files']['name'][$key]); 
+                $fileName = basename($_FILES['files']['name'][$file_form_name]); 
                 $target_dir = "Uploads/".$roll_no."/";
 
                 if(!is_dir($target_dir)) 
                 {
                     mkdir($target_dir);
                 }
-                 $file = $val;
+                 $file = $file_name;
                  $path = pathinfo($file);
                  $filename = $path['filename'];
                  $ext = $path['extension'];
                  if(in_array($ext, $allowTypes)) 
                  {
-                    $temp_name = $_FILES['files']['tmp_name'][$key];
+                    $temp_name = $_FILES['files']['tmp_name'][$file_form_name];
                     $path_filename_ext = $target_dir.$filename.".".$ext;
                     if(!file_exists($path_filename_ext))
                     {
@@ -295,12 +296,8 @@ function assignment_submission_form_submit($form, &$form_state) {
 
             }
 
-            }}
-            else{ 
-                    $statusMsg = 'Please select a file to upload.'; 
-                    } 
-
-
-
+            }
+          }
+  
   drupal_set_message(t('The form has been submitted and the Files has been saved.'));
 }
