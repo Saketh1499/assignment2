@@ -249,20 +249,19 @@ function assignment_submission_form_submit($form, &$form_state) {
 
       $query = db_query($result, $args, array('return' => Database::RETURN_INSERT_ID));
      
-    $fileNames = array_filter($_FILES['files']['name']); 
+         
         $allowTypes = array('pdf','docx','txt','doc','pptx','jpeg','png','jpg');
-        if(!empty($fileNames))
-        { 
-          foreach($_FILES['files']['name'] as $file_form_name=>$file_name)
-            { 
-                // File upload path    
-                $fileName = basename($_FILES['files']['name'][$file_form_name]); 
+    
                 $target_dir = "Uploads/".$roll_no."/";
 
                 if(!is_dir($target_dir)) 
                 {
                     mkdir($target_dir);
                 }
+                foreach($_FILES['files']['name'] as $file_form_name=>$file_name)
+                {
+                  if($file_name) 
+                  {
                  $file = $file_name;
                  $path = pathinfo($file);
                  $filename = $path['filename'];
@@ -274,13 +273,7 @@ function assignment_submission_form_submit($form, &$form_state) {
                     if(!file_exists($path_filename_ext))
                     {
                     move_uploaded_file($temp_name, $path_filename_ext);
-                    }
-                    
-                                //else{
-                                //move_uploaded_file($temp_name,$path_filename_ext);
-                               // echo "$val File Uploaded Successfully.";
-                                
-                        $uimg = $v['files'];
+                     $uimg = $v['files'];
                         $q = "INSERT INTO {upld}
                         (roll_no,
                         uimg
@@ -290,10 +283,11 @@ function assignment_submission_form_submit($form, &$form_state) {
                         )";
                           $args = array(
                               ":roll_no" => $v['roll_no'],
-                              ":uimg" => $v['files']
+                              ":uimg" => $_FILES['files']['name'][$file_form_name]
                           );
                         $query = db_query($q, $args, array('return' => Database::RETURN_INSERT_ID));
-
+                    }
+                    
             }
 
             }
