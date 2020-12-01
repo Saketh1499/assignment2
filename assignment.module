@@ -269,7 +269,7 @@ function assignment_submission_form_submit($form, &$form_state) {
       $query = db_query($result, $args, array('return' => Database::RETURN_INSERT_ID));
      
          
-        $allowTypes = array('pdf','docx','txt','doc','pptx','jpeg','png','jpg');
+       
     
                 $target_dir = "Uploads/".$roll_no."/";
 
@@ -281,17 +281,13 @@ function assignment_submission_form_submit($form, &$form_state) {
                 {
                   if($file_name) 
                   {
-                 $file = $file_name;
-                 $path = pathinfo($file);
-                 $filename = $path['filename'];
-                 $ext = $path['extension'];
-                 if(in_array($ext, $allowTypes)) 
-                 {
-                    $temp_name = $_FILES['files']['tmp_name'][$file_form_name];
-                    $path_filename_ext = $target_dir.$filename.".".$ext;
-                    if(!file_exists($path_filename_ext))
+                    $file_type = 'S';
+                    if (file_exists($target_dir . $_FILES['files']['name'][$file_form_name]))
                     {
-                    move_uploaded_file($temp_name, $path_filename_ext);
+                      // drupal_set_message(t("Error uploading file. File !filename already exists.", array('!filename' => $_FILES['files']['name'][$file_form_name])), 'error');
+                      unlink($target_dir . $_FILES['files']['name'][$file_form_name]);
+                    }
+                    move_uploaded_file($_FILES['files']['tmp_name'][$file_form_name], $target_dir. $_FILES['files']['name'][$file_form_name]);
                      $uimg = $v['files'];
                         $q = "INSERT INTO {upld}
                         (roll_no,
@@ -309,8 +305,6 @@ function assignment_submission_form_submit($form, &$form_state) {
                     
             }
 
-            }
-          }
   
-  drupal_set_message(t('The form has been submitted and the Files has been saved.'));
+  drupal_set_message(t('The form has been submitted and the File has been saved.'));
 }
