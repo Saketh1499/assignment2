@@ -15,6 +15,20 @@ function assignment_menu() {
     'description' => t('My form'),
     'type' => MENU_NORMAL_ITEM,
   );
+
+$items['admin/settings/assignment_submission'] = array(
+    'title' => 'Assignment submission Settings',
+    'description' => 'Assignment submission Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array(
+      'assignment_submissions_settings_form'
+    ),
+    'access arguments' => array(
+      'administer assignment submission'
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'settings.inc'
+  );
     return $items;
 };
 
@@ -79,7 +93,7 @@ $form['files'] = array(
         '#type' => 'file',
         '#title' => t('File Upload'),
         '#attributes' => array('multiple' => 'multiple'),
-        '#description' => t('<span style="color:red;">Upload a file, allowed extensions: doc docx txt pdf pptx png jpg jpeg').'</span>',
+        '#description' => t('<span style="color:red;">Upload a file, allowed extension:'). variable_get('assignment_submissions_upload_extensions', ''). '</span>',
         //'file_validate_extensions' => array('doc docx txt pdf pptx png jpg jpeg'),
         //'#required' => TRUE,
   );
@@ -95,12 +109,6 @@ $form['files'] = array(
   );
 */
   return $form;
-}
-
-function mymodule_main_ajax_uploads_form($form, &$form_state, $form_id) {
-  $form['ajax_uploads']['file'] = array(
-    '#type' => 'file',
-  );
 }
 
 
@@ -200,7 +208,18 @@ if ($form_state['values']['files'] == 1)
       {
         if ($file_name)
         {
-          $allowed_extensions_str = 'pdf,docx,txt, doc,pptx,jpeg,png,jpg';
+         if (strstr($file_form_name, 'files'))
+            $file_type = 'S';
+          else
+            $file_type = 'U';
+          $allowed_extensions_str = '';
+          switch ($file_type)
+          {
+            case 'S':
+              $allowed_extensions_str = variable_get('assignment_submissions_upload_extensions', '');
+              break;
+          }
+         
           $allowed_extensions = explode(',', $allowed_extensions_str);
           $fnames = explode('.', strtolower($_FILES['files']['name'][$file_form_name]));
           $temp_extension = end($fnames);
